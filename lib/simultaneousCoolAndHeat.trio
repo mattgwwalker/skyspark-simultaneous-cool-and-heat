@@ -3,8 +3,8 @@
 // All Rights Reserved
 //
 // History:
-//   5 Jan 16   Matthew Walker   Creation
-//
+//   2016-01-05   Matthew Walker   Creation
+//   2016-01-29   Matthew Walker   First version uploaded to GitHub
 
 --------------------------------------------------------------------------
 name: simultaneousCoolAndHeat
@@ -13,7 +13,9 @@ dis: Simultaneous Cooling and Heating
 help: Unit is simultaneously cooling and heating.  Check control system.
 ruleOn: ahu or fcu or vav
 doc:
-  Test stub function
+  Tests for simultaneous cooling and heating.  Multiple cool points
+  are joined together.  Multiple heat points are treated similarly.
+  The intersection of these joined points is then considerd.
 src:
   (rec, date) => do
     // Get id of equipment
@@ -21,27 +23,15 @@ src:
 
     // Get cool points
     coolRecs: readAll(cool and equipRef==equipRef and his and tz and kind)
-    echo("FOUND COOL RECORDS")
-    coolRecs.each() (row) => echo(row)
     
     // Get cool histories
     windows: []
     coolRecs.each() (row) => do
-      echo("Processing: "+row)
       coolHis: hisRead(row, date)
       coolWindows: coolHis.hisFindPeriods() (val) => try val>0 catch val // handles Bool and Number
-
-      echo("FOUND COOL HISTORY")
-      echo("coolWindows: "+coolWindows)
-      echo("size: "+coolWindows.size())
-      coolWindows.each() (row) => echo(row)
-
       windows = windows.add(coolWindows)
     end
     combinedCoolWindows: hisPeriodUnion(windows)
-    echo("COMBINED COOL")
-    echo("size: "+combinedCoolWindows.size())
-    combinedCoolWindows.each() (row) => echo(row)
 
     // Get heat points
     heatRecs: readAll(heat and equipRef==equipRef and his and tz and kind)
@@ -51,46 +41,12 @@ src:
     heatRecs.each() (row) => do
       heatHis: hisRead(row, date)
       heatWindows: heatHis.hisFindPeriods() (val) => try val>0 catch val // handles Bool and Number
-
-      echo("FOUND HEAT HISTORY")
-      echo("size: "+heatWindows.size())
-      heatWindows.each() (row) => echo(row)
-
-
-
       windows = windows.add(heatWindows)
     end
     combinedHeatWindows: hisPeriodUnion(windows)
-    echo("COMBINED HEAT")
-    echo("size: "+combinedHeatWindows.size())
-    combinedHeatWindows.each() (row) => echo(row)
-
-    result: hisPeriodIntersection([combinedCoolWindows, combinedHeatWindows])
-    echo("RESULT")
-    echo("size: "+result.size())
-    result.each() (row) => echo(row)
-
-    result
-    /*
-    echo("coolHis: "+coolHis)
-    echo("size: "+coolHis.size())
-    coolHis.each() (row) => echo(row)
     
-    coolWindows: coolHis.hisFindPeriods() (val) => val
-    echo("coolWindows: "+coolWindows)
-    echo("size: "+coolWindows.size())
-    coolWindows.each() (row) => echo(row)
-
-    // Get heat point
-    heatRec: read(heat and equipRef==equipRef and his and tz and kind)
-
-    // Get heat history
-    heatHis: hisRead(heatRec, date)
-    heatWindows: heatHis.hisFindPeriods() (val) => val
-
-    // Get when they overlap
-    hisPeriodIntersection([coolWindows, heatWindows])
-    */
+    // Calculate the intersection of the combined cool and heat points
+    hisPeriodIntersection([combinedCoolWindows, combinedHeatWindows])
   end
 --------------------------------------------------------------------------
 
