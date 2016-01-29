@@ -390,6 +390,14 @@ class SimultaneousCoolAndHeatTest : ProjTest
 
 
   @DbTest
+  Void testBasicNumericModelIsComplete()
+  {
+    ahuRef := createBasicNumericModel(proj)["ahuRef"]
+    verifyEq(SimultaneousCoolAndHeat.testModel(ahuRef, proj), null)
+  }
+
+
+  @DbTest
   Void testMultiStageModelIsComplete()
   {
     ahuRef := createMultiStageModel(proj)["ahuRef"]
