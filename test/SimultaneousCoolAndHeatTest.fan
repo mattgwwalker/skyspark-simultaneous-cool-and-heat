@@ -35,7 +35,7 @@ class SimultaneousCoolAndHeatTest : ProjTest
 
   static Ref createHeatModel(Proj proj, Ref equipRef, Str kind := "Bool")
   {
-    // Create Cool point
+    // Create Heat point
     diff := Diff.makeAdd( ["heat"  : Marker.val,
                            "point" : Marker.val,
                            "his"   : Marker.val,
@@ -46,7 +46,7 @@ class SimultaneousCoolAndHeatTest : ProjTest
     return diff2.id
   }
 
-
+  // Creates a model of an AHU that has binary heating and cooling
   static Str:Ref createBasicModel(Proj? proj := null)
   {
     if (proj==null) proj = Context.cur.proj
@@ -66,6 +66,8 @@ class SimultaneousCoolAndHeatTest : ProjTest
   }
 
 
+  // Creates a model of an AHU that has cooling and heating represented
+  // by numbers (such as "percentage of full power")
   static Str:Ref createBasicNumericModel(Proj? proj := null)
   {
     if (proj==null) proj = Context.cur.proj
@@ -84,7 +86,8 @@ class SimultaneousCoolAndHeatTest : ProjTest
     return ["ahuRef":ahuRef, "coolRef":coolRef, "heatRef":heatRef]
   }
 
-
+  // Creates a model of an AHU that has multi-stage binary
+  // heating and cooling
   static Str:Ref createMultiStageModel(Proj? proj := null)
   {
     if (proj==null) proj = Context.cur.proj
